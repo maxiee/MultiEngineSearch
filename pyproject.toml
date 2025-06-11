@@ -1,18 +1,25 @@
 [project]
 name = "multienginesearch"
 version = "0.1.0"
-description = ""
+description = "Multi-Engine Search - 多引擎搜索工具"
 authors = [
     {name = "Maxiee",email = "maxieewong@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "typer[all] (>=0.16.0,<0.17.0)"
 ]
+
+[project.scripts]
+mse = "multienginesearch.cli:main"
 
 [tool.poetry]
 packages = [{include = "multienginesearch", from = "src"}]
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
