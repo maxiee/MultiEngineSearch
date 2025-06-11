@@ -13,7 +13,7 @@ def test_version_command():
     """测试版本命令"""
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
-    assert "Multi-Engine Search (mse) v0.1.0" in result.stdout
+    assert "Multi-Engine Search (mes) v0.1.0" in result.stdout
 
 
 def test_config_list_command():

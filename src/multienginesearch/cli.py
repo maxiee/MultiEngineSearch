@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 from .engines import SearchEngineFactory, format_results
 
 app = typer.Typer(
-    name="mse",
+    name="mes",
     help="Multi-Engine Search - 多引擎搜索工具",
     add_completion=False,
     rich_markup_mode="markdown"
@@ -55,9 +55,9 @@ def search(
     
     **示例用法:**
     
-    - `mse search "python tutorial"`
-    - `mse search "机器学习" --engine google --limit 5`
-    - `mse search "AI新闻" --output json --verbose`
+    - `mes search "python tutorial"`
+    - `mes search "机器学习" --engine google --limit 5`
+    - `mes search "AI新闻" --output json --verbose`
     """
     if verbose:
         typer.echo(f"正在搜索: {query}")
@@ -114,8 +114,8 @@ def config(
     
     **示例用法:**
     
-    - `mse config --list`
-    - `mse config --set-default google`
+    - `mes config --list`
+    - `mes config --set-default google`
     """
     if list_engines:
         typer.echo("📋 可用的搜索引擎:")
@@ -143,7 +143,7 @@ def version():
     """
     显示版本信息
     """
-    typer.echo("🔍 Multi-Engine Search (mse) v0.1.0")
+    typer.echo("🔍 Multi-Engine Search (mes) v0.1.0")
     typer.echo("   一个强大的多引擎搜索工具")
 
 

@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mse = "multienginesearch.cli:main"
+mes = "multienginesearch.cli:main"
 
 [tool.poetry]
 packages = [{include = "multienginesearch", from = "src"}]

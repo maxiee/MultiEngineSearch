@@ -1,10 +1,10 @@
-# MultiEngineSearch (mse)
+# MultiEngineSearch (mes)
 
 一个遵循Unix哲学原则的多搜索引擎统一命令行界面工具。
 
 ## 概述
 
-MultiEngineSearch (mse) 是一个轻量级、可扩展的命令行工具，提供了查询多个搜索引擎的统一接口。它专注于做好一件事：通过一致的输出格式和灵活的配置选项在不同引擎间进行搜索。
+MultiEngineSearch (mes) 是一个轻量级、可扩展的命令行工具，提供了查询多个搜索引擎的统一接口。它专注于做好一件事：通过一致的输出格式和灵活的配置选项在不同引擎间进行搜索。
 
 ## 特性
 
@@ -36,25 +36,25 @@ poetry shell
 
 ```bash
 # 基本搜索 (默认使用 DuckDuckGo)
-mse search "python编程教程"
+mes search "python编程教程"
 
 # 使用指定搜索引擎
-mse search "机器学习基础" --engine duckduckgo
+mes search "机器学习基础" --engine duckduckgo
 
 # 输出为JSON格式
-mse search "网页开发" --output json --limit 5
+mes search "网页开发" --output json --limit 5
 
 # 输出为表格格式
-mse search "人工智能" --output table --limit 3
+mes search "人工智能" --output table --limit 3
 
 # 显示详细信息
-mse search "深度学习" --verbose --limit 5
+mes search "深度学习" --verbose --limit 5
 
 # 查看可用的搜索引擎
-mse config --list
+mes config --list
 
 # 查看版本信息
-mse version
+mes version
 ```
 
 ## 使用方法
@@ -62,7 +62,7 @@ mse version
 ### 搜索命令
 
 ```bash
-mse search [查询内容] [选项]
+mes search [查询内容] [选项]
 ```
 
 **选项:**
@@ -74,22 +74,22 @@ mse search [查询内容] [选项]
 **示例:**
 ```bash
 # 基本搜索 (使用默认 DuckDuckGo 引擎)
-mse search "Python教程"
+mes search "Python教程"
 
 # 指定引擎和结果数量
-mse search "机器学习" --engine duckduckgo --limit 5
+mes search "机器学习" --engine duckduckgo --limit 5
 
 # JSON格式输出
-mse search "AI新闻" --output json --verbose
+mes search "AI新闻" --output json --verbose
 
 # 表格格式输出
-mse search "数据科学" --output table --limit 3
+mes search "数据科学" --output table --limit 3
 ```
 
 ### 配置命令
 
 ```bash
-mse config [选项]
+mes config [选项]
 ```
 
 **选项:**
@@ -99,24 +99,24 @@ mse config [选项]
 **示例:**
 ```bash
 # 列出可用引擎
-mse config --list
+mes config --list
 
 # 设置默认引擎 (功能开发中)
-mse config --set-default duckduckgo
+mes config --set-default duckduckgo
 ```
 
 ### 版本信息
 
 ```bash
 # 显示版本信息
-mse version
+mes version
 ```
 
 ## 使用示例
 
 ### 基本搜索
 ```bash
-$ mse search "Python编程教程" --limit 3
+$ mes search "Python编程教程" --limit 3
 🔍 找到 3 个搜索结果:
 
  1. Python入门教程：从零基础到精通的完整指南 - 知乎
@@ -137,7 +137,7 @@ $ mse search "Python编程教程" --limit 3
 
 ### JSON 格式输出
 ```bash
-$ mse search "机器学习" --output json --limit 2
+$ mes search "机器学习" --output json --limit 2
 [
   {
     "title": "机器学习 - 维基百科，自由的百科全书",
@@ -156,7 +156,7 @@ $ mse search "机器学习" --output json --limit 2
 
 ### 表格格式输出
 ```bash
-$ mse search "人工智能" --output table --limit 2
+$ mes search "人工智能" --output table --limit 2
 ┌─────────────────────────────────────────────────────────────────────┐
 │                            搜索结果                                  │
 ├─────────────────────────────────────────────────────────────────────┤
