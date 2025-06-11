@@ -6,6 +6,7 @@ Multi-Engine Search CLI
 import typer
 from typing import Optional
 from typing_extensions import Annotated
+from .engines import SearchEngineFactory, format_results
 
 app = typer.Typer(
     name="mse",
@@ -60,13 +61,35 @@ def search(
     """
     if verbose:
         typer.echo(f"正在搜索: {query}")
-        typer.echo(f"搜索引擎: {engine or '全部'}")
+        typer.echo(f"搜索引擎: {engine or '默认 (DuckDuckGo)'}")
         typer.echo(f"结果限制: {limit}")
         typer.echo(f"输出格式: {output}")
     
-    # TODO: 实现搜索逻辑
-    typer.echo(f"🔍 搜索 '{query}' 的结果将在这里显示...")
-    typer.echo("⚠️  搜索功能尚未实现，请稍后...")
+    # 默认使用 DuckDuckGo
+    engine_name = engine or "duckduckgo"
+    
+    # 创建搜索引擎实例
+    search_engine = SearchEngineFactory.create_engine(engine_name)
+    
+    if not search_engine:
+        available_engines = SearchEngineFactory.get_available_engines()
+        typer.echo(f"❌ 不支持的搜索引擎: {engine_name}")
+        typer.echo(f"� 可用的搜索引擎: {', '.join(available_engines)}")
+        raise typer.Exit(1)
+    
+    # 执行搜索
+    if verbose:
+        typer.echo(f"🔍 正在使用 {search_engine.name} 搜索...")
+    
+    results = search_engine.search(query, limit)
+    
+    if not results:
+        typer.echo("❌ 没有找到搜索结果")
+        return
+    
+    # 格式化并输出结果
+    formatted_results = format_results(results, output or "simple")
+    typer.echo(formatted_results)
 
 
 @app.command()
@@ -96,13 +119,23 @@ def config(
     """
     if list_engines:
         typer.echo("📋 可用的搜索引擎:")
-        engines = ["google", "bing", "duckduckgo", "baidu"]
+        engines = SearchEngineFactory.get_available_engines()
         for engine in engines:
             typer.echo(f"  • {engine}")
+        
+        typer.echo("\n💡 计划支持的搜索引擎:")
+        planned_engines = ["google", "bing", "baidu"]
+        for engine in planned_engines:
+            typer.echo(f"  • {engine} (开发中)")
     
     if set_default:
-        typer.echo(f"✅ 已设置默认搜索引擎为: {set_default}")
-        # TODO: 实现配置保存逻辑
+        available_engines = SearchEngineFactory.get_available_engines()
+        if set_default in available_engines:
+            typer.echo(f"✅ 已设置默认搜索引擎为: {set_default}")
+            # TODO: 实现配置保存逻辑
+        else:
+            typer.echo(f"❌ 不支持的搜索引擎: {set_default}")
+            typer.echo(f"💡 可用的搜索引擎: {', '.join(available_engines)}")
 
 
 @app.command()

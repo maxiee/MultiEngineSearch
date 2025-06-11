@@ -8,7 +8,8 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "typer[all] (>=0.16.0,<0.17.0)"
+    "typer[all] (>=0.16.0,<0.17.0)",
+    "duckduckgo-search>=6.0.0"
 ]
 
 [project.scripts]

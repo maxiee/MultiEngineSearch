@@ -21,16 +21,16 @@ def test_config_list_command():
     result = runner.invoke(app, ["config", "--list"])
     assert result.exit_code == 0
     assert "可用的搜索引擎:" in result.stdout
-    assert "google" in result.stdout
-    assert "bing" in result.stdout
     assert "duckduckgo" in result.stdout
+    assert "计划支持的搜索引擎:" in result.stdout
 
 
 def test_search_command():
     """测试搜索命令"""
     result = runner.invoke(app, ["search", "test query"])
     assert result.exit_code == 0
-    assert "搜索 'test query' 的结果将在这里显示" in result.stdout
+    # 现在搜索会返回实际结果，而不是占位符消息
+    assert "找到" in result.stdout and "个搜索结果" in result.stdout
 
 
 def test_search_with_verbose():
@@ -38,23 +38,48 @@ def test_search_with_verbose():
     result = runner.invoke(app, ["search", "test query", "--verbose"])
     assert result.exit_code == 0
     assert "正在搜索: test query" in result.stdout
-    assert "搜索引擎: 全部" in result.stdout
+    assert "搜索引擎: 默认 (DuckDuckGo)" in result.stdout
 
 
 def test_search_with_options():
-    """测试带选项的搜索命令"""
-    result = runner.invoke(app, [
-        "search", "test query", 
-        "--engine", "google", 
-        "--limit", "5", 
-        "--output", "json",
-        "--verbose"
-    ])
+    """测试带选项的搜索命令 - 使用不支持的引擎"""
+    result = runner.invoke(
+        app,
+        [
+            "search",
+            "test query",
+            "--engine",
+            "google",
+            "--limit",
+            "5",
+            "--output",
+            "json",
+            "--verbose",
+        ],
+    )
+    # Google 引擎不支持，应该返回错误
+    assert result.exit_code == 1
+    assert "不支持的搜索引擎: google" in result.stdout
+
+
+def test_search_with_duckduckgo():
+    """测试使用 DuckDuckGo 搜索"""
+    result = runner.invoke(
+        app,
+        [
+            "search",
+            "python tutorial",
+            "--engine",
+            "duckduckgo",
+            "--limit",
+            "3",
+            "--verbose",
+        ],
+    )
     assert result.exit_code == 0
-    assert "正在搜索: test query" in result.stdout
-    assert "搜索引擎: google" in result.stdout
-    assert "结果限制: 5" in result.stdout
-    assert "输出格式: json" in result.stdout
+    assert "正在搜索: python tutorial" in result.stdout
+    assert "搜索引擎: duckduckgo" in result.stdout
+    assert "结果限制: 3" in result.stdout
 
 
 def test_help_command():
