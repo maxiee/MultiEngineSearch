@@ -1,0 +1,19 @@
+[project]
+name = "multienginesearch"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Maxiee",email = "maxieewong@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[tool.poetry]
+packages = [{include = "multienginesearch", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
