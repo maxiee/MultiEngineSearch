@@ -35,22 +35,28 @@ SAVE_PATH="${MES_SAVE_PATH}"
 # 创建目录
 mkdir -p "$SAVE_PATH"
 
-# 时间筛选说明
-declare -A TIME_LABELS
-TIME_LABELS[d]="最近一天"
-TIME_LABELS[w]="最近一周"
-TIME_LABELS[m]="最近一月"
-TIME_LABELS[y]="最近一年"
+# 时间筛选说明函数
+get_time_label() {
+    case "$1" in
+        "d") echo "最近一天" ;;
+        "w") echo "最近一周" ;;
+        "m") echo "最近一月" ;;
+        "y") echo "最近一年" ;;
+        *) echo "未知" ;;
+    esac
+}
+
+TIME_LABEL=$(get_time_label "$TIME_FILTER")
 
 echo "🔍 正在搜索: $KEYWORD"
-echo "⏰ 时间筛选: ${TIME_LABELS[$TIME_FILTER]}"
+echo "⏰ 时间筛选: $TIME_LABEL"
 echo "📁 保存路径: $SAVE_PATH/$FILENAME"
 
 # 执行搜索并保存
 echo "# 搜索结果: $KEYWORD" > "$SAVE_PATH/$FILENAME"
 echo "" >> "$SAVE_PATH/$FILENAME"
 echo "搜索时间: $(date)" >> "$SAVE_PATH/$FILENAME"
-echo "时间筛选: ${TIME_LABELS[$TIME_FILTER]}" >> "$SAVE_PATH/$FILENAME"
+echo "时间筛选: $TIME_LABEL" >> "$SAVE_PATH/$FILENAME"
 echo "" >> "$SAVE_PATH/$FILENAME"
 mes search "$KEYWORD" --time "$TIME_FILTER" >> "$SAVE_PATH/$FILENAME"
 
