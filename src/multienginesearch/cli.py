@@ -39,7 +39,7 @@ def search(
         Optional[str],
         typer.Option(
             "--output", "-o",
-            help="输出格式 (json, table, simple)"
+            help="输出格式 (json, simple)"
         )
     ] = "simple",
     verbose: Annotated[
