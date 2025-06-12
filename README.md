@@ -155,7 +155,7 @@ $ mes search "Python编程教程" --limit 3
 
 # 实际使用示例
 mes search "Python 3.12新特性" --time m      # 查找最近一月内的Python 3.12相关内容
-mes search "区块链最新动态" --time w --json    # 最近一周的区块链新闻，JSON格式输出
+mes search "区块链最新动态" --time w --output json    # 最近一周的区块链新闻，JSON格式输出
 mes search "ChatGPT更新" --time d --limit 5   # 最近一天ChatGPT相关信息，限制5条结果
 ```
 
