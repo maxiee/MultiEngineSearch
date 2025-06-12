@@ -10,11 +10,12 @@ MultiEngineSearch (mes) 是一个轻量级、可扩展的命令行工具，提�
 
 - **多搜索引擎支持**: 目前支持 DuckDuckGo，计划支持 Google、Bing 等引擎
 - **灵活的输出格式**: 支持 JSON 和简单 (simple) 格式输出
+- **时间筛选**: 支持按时间范围筛选搜索结果 (最近一天/周/月/年)
 - **Unix友好**: 支持管道、重定向，遵循Unix约定
 - **可配置**: 支持搜索引擎配置和参数调整
 - **可扩展**: 基于工厂模式的架构，便于添加新的搜索引擎
 - **轻量级**: 最小依赖，快速执行
-- **错误处理**: 优雅的错误处理和用户友好的提示
+- **错误handling**: 优雅的错误处理和用户友好的提示
 
 ## 安装
 
@@ -47,6 +48,10 @@ mes search "网页开发" --output json --limit 5
 # 显示详细信息
 mes search "深度学习" --verbose --limit 5
 
+# 时间筛选搜索
+mes search "最新AI新闻" --time d --limit 10   # 搜索最近一天的结果
+mes search "本周技术新闻" --time w             # 搜索最近一周的结果
+
 # 查看可用的搜索引擎
 mes config --list
 
@@ -66,6 +71,7 @@ mes search [查询内容] [选项]
 - `--engine, -e`: 指定搜索引擎 (目前支持: duckduckgo)
 - `--limit, -l`: 返回结果数量限制 (1-100，默认10)
 - `--output, -o`: 输出格式 (json, simple，默认simple)
+- `--time, -t`: 时间筛选范围 (d=最近一天, w=最近一周, m=最近一月, y=最近一年，默认无限制)
 - `--verbose, -v`: 显示详细信息
 
 **示例:**
@@ -78,6 +84,15 @@ mes search "机器学习" --engine duckduckgo --limit 5
 
 # JSON格式输出
 mes search "AI新闻" --output json --verbose
+
+# 时间筛选搜索
+mes search "AI最新进展" --time d --limit 10    # 最近一天的结果
+mes search "机器学习新闻" --time w              # 最近一周的结果
+mes search "深度学习论文" --time m              # 最近一月的结果
+mes search "人工智能发展" --time y              # 最近一年的结果
+
+# 组合使用时间筛选和其他选项
+mes search "ChatGPT新闻" --time w --output json --limit 5 --verbose
 ```
 
 ### 配置命令
@@ -129,6 +144,21 @@ $ mes search "Python编程教程" --limit 3
     🔍 来源: duckduckgo
 ```
 
+### 时间筛选搜索
+```bash
+# 时间筛选参数说明
+--time d    # 最近一天 (past day)
+--time w    # 最近一周 (past week)  
+--time m    # 最近一月 (past month)
+--time y    # 最近一年 (past year)
+# 不指定 --time 参数则不限制时间范围
+
+# 实际使用示例
+mes search "Python 3.12新特性" --time m      # 查找最近一月内的Python 3.12相关内容
+mes search "区块链最新动态" --time w --json    # 最近一周的区块链新闻，JSON格式输出
+mes search "ChatGPT更新" --time d --limit 5   # 最近一天ChatGPT相关信息，限制5条结果
+```
+
 ### JSON 格式输出
 ```bash
 $ mes search "机器学习" --output json --limit 2
@@ -148,30 +178,9 @@ $ mes search "机器学习" --output json --limit 2
 ]
 ```
 
-### 详细模式
-```bash
-$ mse search "深度学习" --verbose --limit 2
-正在搜索: 深度学习
-搜索引擎: 默认 (DuckDuckGo)
-结果限制: 2
-输出格式: simple
-🔍 正在使用 duckduckgo 搜索...
-🔍 找到 2 个搜索结果:
-
- 1. 深度学习（人工神经网络的研究的概念）_百度百科
-    🔗 https://baike.baidu.com/item/深度学习/3729729
-    📄 深度学习(Deep Learning)特指基于深层神经网络模型和方法的机器学习...
-    🔍 来源: duckduckgo
-
- 2. 深度学习 - 维基百科，自由的百科全书
-    🔗 https://zh.wikipedia.org/wiki/深度学习
-    📄 深度学习方法常常被视为黑盒，大多数的结论确认都由经验而非理论来确定...
-    🔍 来源: duckduckgo
-```
-
 ### 查看可用引擎
 ```bash
-$ mse config --list
+$ mes config --list
 📋 可用的搜索引擎:
   • duckduckgo
 
@@ -214,6 +223,7 @@ MultiEngineSearch/
 - [x] 多种输出格式支持 (JSON, Simple) ✅
 - [x] 错误处理和用户提示 ✅
 - [x] 完整的测试覆盖 ✅
+- [ ] **时间筛选功能**: 支持按时间范围筛选搜索结果 (开发中) 🔄
 - [ ] 实现Google搜索引擎接口
 - [ ] 实现Bing搜索引擎接口  
 - [ ] 实现Baidu搜索引擎接口
@@ -224,23 +234,6 @@ MultiEngineSearch/
 - [ ] 添加更多输出格式（CSV、XML等）
 - [ ] 添加代理支持
 - [ ] 支持并行多引擎搜索
-
-## 当前功能状态
-
-### ✅ 已实现功能
-- **DuckDuckGo 搜索**: 完整支持文本搜索
-- **多种输出格式**: simple, json
-- **CLI 参数**: --engine, --limit, --output, --verbose
-- **错误处理**: 优雅的错误提示和帮助信息
-- **测试覆盖**: 完整的单元测试和集成测试
-
-### 🚧 开发中功能
-- **配置文件**: 默认引擎设置 (基础框架已完成)
-- **其他搜索引擎**: Google, Bing, Baidu (架构已就绪)
-
-### 📋 计划功能
-- **高级搜索**: 结果过滤、排序、缓存
-- **批量操作**: 多查询、历史记录
 
 ## 贡献
 
