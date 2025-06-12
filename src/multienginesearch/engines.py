@@ -31,8 +31,16 @@ class SearchEngine(ABC):
     """搜索引擎抽象基类"""
 
     @abstractmethod
-    def search(self, query: str, limit: int = 10) -> List[SearchResult]:
-        """执行搜索并返回结果"""
+    def search(
+        self, query: str, limit: int = 10, time_filter: Optional[str] = None
+    ) -> List[SearchResult]:
+        """执行搜索并返回结果
+
+        Args:
+            query: 搜索查询字符串
+            limit: 返回结果数量限制
+            time_filter: 时间筛选参数 (d=一天, w=一周, m=一月, y=一年)
+        """
         pass
 
     @property
@@ -53,14 +61,23 @@ class DuckDuckGoEngine(SearchEngine):
     def name(self) -> str:
         return "duckduckgo"
 
-    def search(self, query: str, limit: int = 10) -> List[SearchResult]:
-        """使用 DuckDuckGo 执行搜索"""
+    def search(
+        self, query: str, limit: int = 10, time_filter: Optional[str] = None
+    ) -> List[SearchResult]:
+        """使用 DuckDuckGo 执行搜索
+
+        Args:
+            query: 搜索查询字符串
+            limit: 返回结果数量限制
+            time_filter: 时间筛选参数 (d=一天, w=一周, m=一月, y=一年)
+        """
         try:
             ddgs = DDGS()
             results = ddgs.text(
                 keywords=query,
                 region=self.region,
                 safesearch=self.safesearch,
+                timelimit=time_filter,  # 传递时间筛选参数
                 max_results=limit,
             )
 

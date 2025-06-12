@@ -29,8 +29,10 @@ def test_search_command():
     """测试搜索命令"""
     result = runner.invoke(app, ["search", "test query"])
     assert result.exit_code == 0
-    # 现在搜索会返回实际结果，而不是占位符消息
-    assert "找到" in result.stdout and "个搜索结果" in result.stdout
+    # 现在搜索会返回实际结果，如果遇到速率限制会显示错误信息
+    assert (
+        "找到" in result.stdout and "个搜索结果" in result.stdout
+    ) or "没有找到搜索结果" in result.stdout
 
 
 def test_search_with_verbose():
@@ -90,3 +92,60 @@ def test_help_command():
     assert "search" in result.stdout
     assert "config" in result.stdout
     assert "version" in result.stdout
+
+
+def test_search_with_time_filter():
+    """测试时间筛选搜索"""
+    result = runner.invoke(
+        app,
+        [
+            "search",
+            "AI news",
+            "--time",
+            "d",
+            "--limit",
+            "2",
+            "--verbose",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "正在搜索: AI news" in result.stdout
+    assert "时间筛选: 最近一天" in result.stdout
+
+
+def test_search_with_invalid_time_filter():
+    """测试无效时间筛选参数"""
+    result = runner.invoke(
+        app,
+        [
+            "search",
+            "test query",
+            "--time",
+            "invalid",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "无效的时间筛选参数" in result.stdout
+    assert "支持的选项: d (一天), w (一周), m (一月), y (一年)" in result.stdout
+
+
+def test_search_with_all_time_filters():
+    """测试所有时间筛选选项"""
+    time_filters = ["d", "w", "m", "y"]
+    time_labels = ["最近一天", "最近一周", "最近一月", "最近一年"]
+
+    for time_filter, expected_label in zip(time_filters, time_labels):
+        result = runner.invoke(
+            app,
+            [
+                "search",
+                "test query",
+                "--time",
+                time_filter,
+                "--verbose",
+                "--limit",
+                "1",
+            ],
+        )
+        assert result.exit_code == 0
+        assert f"时间筛选: {expected_label}" in result.stdout

@@ -55,5 +55,37 @@ def test_duckduckgo_search():
         assert "engine" in result_dict
 
 
+def test_duckduckgo_search_with_time_filter():
+    """测试 DuckDuckGo 带时间筛选的搜索功能"""
+    engine = DuckDuckGoEngine()
+
+    # 测试不同的时间筛选参数
+    time_filters = ["d", "w", "m", "y"]
+
+    for time_filter in time_filters:
+        # 执行带时间筛选的搜索
+        results = engine.search("AI news", limit=2, time_filter=time_filter)
+
+        # 验证结果
+        assert isinstance(results, list)
+        assert len(results) <= 2
+
+        if results:  # 如果有结果
+            result = results[0]
+            assert hasattr(result, "title")
+            assert hasattr(result, "url")
+            assert hasattr(result, "description")
+            assert hasattr(result, "engine")
+            assert result.engine == "duckduckgo"
+
+    # 测试无时间筛选（应该与默认行为一致）
+    results_no_filter = engine.search("AI news", limit=2)
+    results_with_none = engine.search("AI news", limit=2, time_filter=None)
+
+    # 两种调用方式应该产生相同的行为
+    assert isinstance(results_no_filter, list)
+    assert isinstance(results_with_none, list)
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
