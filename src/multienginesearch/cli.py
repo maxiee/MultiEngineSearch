@@ -23,7 +23,7 @@ def search(
         Optional[str], 
         typer.Option(
             "--engine", "-e",
-            help="指定搜索引擎 (google, bing, duckduckgo)"
+            help="指定搜索引擎 (google, duckduckgo, bing)"
         )
     ] = None,
     limit: Annotated[
@@ -140,7 +140,7 @@ def config(
             typer.echo(f"  • {engine}")
         
         typer.echo("\n💡 计划支持的搜索引擎:")
-        planned_engines = ["google", "bing", "baidu"]
+        planned_engines = ["bing", "baidu"]
         for engine in planned_engines:
             typer.echo(f"  • {engine} (开发中)")
     

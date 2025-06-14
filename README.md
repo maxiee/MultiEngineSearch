@@ -8,7 +8,7 @@ MultiEngineSearch (mes) 是一个轻量级、可扩展的命令行工具，提�
 
 ## 特性
 
-- **多搜索引擎支持**: 目前支持 DuckDuckGo，计划支持 Google、Bing 等引擎
+- **多搜索引擎支持**: 目前支持 DuckDuckGo 和 Google Custom Search API，计划支持 Bing 等引擎
 - **灵活的输出格式**: 支持 JSON 和简单 (simple) 格式输出
 - **时间筛选**: 支持按时间范围筛选搜索结果 (最近一天/周/月/年)
 - **Unix友好**: 支持管道、重定向，遵循Unix约定
@@ -41,6 +41,7 @@ mes search "python编程教程"
 
 # 使用指定搜索引擎
 mes search "机器学习基础" --engine duckduckgo
+mes search "深度学习教程" --engine google      # 需要配置API密钥
 
 # 输出为JSON格式
 mes search "网页开发" --output json --limit 5
@@ -68,7 +69,7 @@ mes search [查询内容] [选项]
 ```
 
 **选项:**
-- `--engine, -e`: 指定搜索引擎 (目前支持: duckduckgo)
+- `--engine, -e`: 指定搜索引擎 (目前支持: duckduckgo, google)
 - `--limit, -l`: 返回结果数量限制 (1-100，默认10)
 - `--output, -o`: 输出格式 (json, simple，默认simple)
 - `--time, -t`: 时间筛选范围 (d=最近一天, w=最近一周, m=最近一月, y=最近一年，默认无限制)
@@ -81,6 +82,7 @@ mes search "Python教程"
 
 # 指定引擎和结果数量
 mes search "机器学习" --engine duckduckgo --limit 5
+mes search "人工智能" --engine google --limit 5     # 需要配置API密钥
 
 # JSON格式输出
 mes search "AI新闻" --output json --verbose
@@ -183,12 +185,42 @@ $ mes search "机器学习" --output json --limit 2
 $ mes config --list
 📋 可用的搜索引擎:
   • duckduckgo
+  • google
 
 💡 计划支持的搜索引擎:
-  • google (开发中)
   • bing (开发中)
   • baidu (开发中)
 ```
+
+### Google 搜索引擎配置 (可选)
+
+如果要使用 Google 搜索引擎，需要配置 Google Custom Search API：
+
+1. **获取 API 密钥**：
+   - 访问 [Google Cloud Console](https://console.cloud.google.com/)
+   - 创建新项目或选择现有项目
+   - 启用 Custom Search API
+   - 创建 API 密钥
+
+2. **创建自定义搜索引擎**：
+   - 访问 [Programmable Search Engine](https://programmablesearchengine.google.com/)
+   - 创建新的搜索引擎
+   - 获取搜索引擎 ID (Search Engine ID)
+
+3. **设置环境变量**：
+   ```bash
+   export MES_GOOGLE_API_KEY="your_api_key_here"
+   export MES_GOOGLE_SEARCH_ENGINE_ID="your_search_engine_id_here"
+   ```
+
+   或在 `.bashrc` / `.zshrc` 中添加：
+   ```bash
+   # Google Search API 配置
+   export MES_GOOGLE_API_KEY="your_api_key_here"
+   export MES_GOOGLE_SEARCH_ENGINE_ID="your_search_engine_id_here"
+   ```
+
+**注意**: Google 每天免费提供 100 次 API 调用额度，超出后按 $5/1000 次调用收费。
 
 ## 技术栈
 
@@ -196,6 +228,8 @@ $ mes config --list
 - **Typer**: 强大的CLI框架，提供丰富的命令行功能
 - **Poetry**: 现代Python依赖管理和打包工具
 - **DuckDuckGo Search**: 免费的搜索API，无需API密钥
+- **Google Custom Search API**: Google官方搜索API，需要API密钥
+- **Requests**: HTTP库，用于API请求
 - **Rich**: 美观的终端输出和格式化 (通过Typer集成)
 
 ## 项目结构
@@ -211,7 +245,8 @@ MultiEngineSearch/
 │   ├── test_cli.py             # CLI功能测试
 │   └── test_engines.py         # 搜索引擎测试
 ├── docs/                        # 文档
-│   └── duckduckgo_search.md    # DuckDuckGo API文档
+│   ├── duckduckgo_search.md    # DuckDuckGo API文档
+│   └── 使用 Google Search API 优雅地搜索互联网.md  # Google API文档
 ├── pyproject.toml              # Poetry配置和项目元数据
 └── README.md                   # 项目文档
 ```
@@ -223,8 +258,8 @@ MultiEngineSearch/
 - [x] 多种输出格式支持 (JSON, Simple) ✅
 - [x] 错误处理和用户提示 ✅
 - [x] 完整的测试覆盖 ✅
-- [x] 时间筛选功能: 支持按时间范围筛选搜索结果 (开发中)  ✅
-- [ ] 实现Google搜索引擎接口
+- [x] 时间筛选功能: 支持按时间范围筛选搜索结果 ✅
+- [x] 实现Google搜索引擎接口 ✅
 - [ ] 实现Bing搜索引擎接口  
 - [ ] 实现Baidu搜索引擎接口
 - [ ] 添加配置文件支持
