@@ -9,7 +9,8 @@ MultiEngineSearch (mes) 是一个轻量级、可扩展的命令行工具，提�
 ## 特性
 
 - **多搜索引擎支持**: 目前支持 DuckDuckGo 和 Google Custom Search API，计划支持 Bing 等引擎
-- **灵活的输出格式**: 支持 JSON 和简单 (simple) 格式输出
+- **API限流跟踪**: Google 搜索引擎支持实时API使用量监控和限流信息显示
+- **灵活的输出格式**: 支持 JSON 和简单 (simple) 格式输出，包含限流信息
 - **时间筛选**: 支持按时间范围筛选搜索结果 (最近一天/周/月/年)
 - **Unix友好**: 支持管道、重定向，遵循Unix约定
 - **可配置**: 支持搜索引擎配置和参数调整
@@ -39,9 +40,10 @@ poetry shell
 # 基本搜索 (默认使用 DuckDuckGo)
 mes search "python编程教程"
 
-# 使用指定搜索引擎
-mes search "机器学习基础" --engine duckduckgo
-mes search "深度学习教程" --engine google      # 需要配置API密钥
+# 使用 Google 搜索引擎 (带限流监控)
+mes search "机器学习" --engine google --limit 5
+# JSON格式查看详细限流信息
+mes search "AI新闻" --engine google --output json
 
 # 输出为JSON格式
 mes search "网页开发" --output json --limit 5
@@ -161,23 +163,53 @@ mes search "区块链最新动态" --time w --output json    # 最近一周的�
 mes search "ChatGPT更新" --time d --limit 5   # 最近一天ChatGPT相关信息，限制5条结果
 ```
 
-### JSON 格式输出
+### JSON 格式输出 (包含限流信息)
 ```bash
-$ mes search "机器学习" --output json --limit 2
-[
-  {
-    "title": "机器学习 - 维基百科，自由的百科全书",
-    "url": "https://zh.wikipedia.org/wiki/机器学习",
-    "description": "机器学习（英語： machine learning ）是人工智能的一个分支...",
-    "engine": "duckduckgo"
-  },
-  {
-    "title": "机器学习简介 - 菜鸟教程",
-    "url": "https://www.runoob.com/ml/ml-intro.html",
-    "description": "机器学习（Machine Learning）是人工智能（AI）的一个分支...",
-    "engine": "duckduckgo"
+$ mes search "机器学习" --engine google --output json --limit 2
+{
+  "results": [
+    {
+      "title": "Machine Learning | Google AI",
+      "url": "https://ai.google/education/",
+      "description": "Learn about machine learning and artificial intelligence...",
+      "engine": "google"
+    },
+    {
+      "title": "机器学习 - 维基百科",
+      "url": "https://zh.wikipedia.org/wiki/机器学习",
+      "description": "机器学习（英語： machine learning ）是人工智能的一个分支...",
+      "engine": "google"
+    }
+  ],
+  "count": 2,
+  "rate_limit": {
+    "daily_limit": 100,
+    "requests_used": 3,
+    "requests_remaining": 97,
+    "limit_exceeded": false
   }
-]
+}
+```
+
+### Simple 格式输出 (包含限流信息)
+```bash
+$ mes search "Python编程" --engine google --limit 2
+🔍 找到 2 个搜索结果:
+
+ 1. Welcome to Python.org
+    🔗 https://www.python.org/
+    📄 The official home of the Python Programming Language.
+    🔍 来源: google
+
+ 2. Python Tutorial - W3Schools
+    🔗 https://www.w3schools.com/python/
+    📄 Well organized and easy to understand Web building tutorials...
+    🔍 来源: google
+
+📊 API 使用情况:
+    • 每日限额: 100 次
+    • 已使用: 5 次
+    • 剩余: 95 次
 ```
 
 ### 查看可用引擎
@@ -195,6 +227,45 @@ $ mes config --list
 ### Google 搜索引擎配置 (可选)
 
 如果要使用 Google 搜索引擎，需要配置 Google Custom Search API：
+
+## API 限流监控
+
+MultiEngineSearch 现在为 Google 搜索引擎提供了实时的 API 使用量监控和限流信息显示。
+
+### 限流信息包括：
+
+- **每日限额**: Google API 每日免费调用限额（默认 100 次）
+- **已使用**: 累计已使用的请求次数（跨会话持久保存）
+- **剩余次数**: 剩余可用的请求次数
+- **是否超额**: 标识是否已达到每日限额
+
+### 特性优势：
+
+1. **实时监控**: 每次搜索后都会显示最新的 API 使用情况
+2. **多格式支持**: 在 JSON 和 Simple 两种输出格式中都包含限流信息
+3. **用户友好**: 提供直观的使用情况显示和警告提示
+4. **智能管理**: 帮助用户合理分配 API 配额，避免超额
+
+### 使用示例：
+
+```bash
+# 使用 Google 搜索，查看限流信息
+mes search "Python 教程" --engine google --limit 3
+
+# JSON 格式查看详细限流数据
+mes search "AI 新闻" --engine google --output json
+```
+
+⚠️ **重要说明**：
+- 限流计数器使用持久化存储（~/.mes_google_quota.json），跨程序重启保持准确
+- 配额重置基于太平洋时间（US/Pacific），与Google API官方周期同步
+- 每天太平洋时间午夜自动重置配额计数器
+- 虽然无法获取Google服务器的实时配额，但本地跟踪非常准确
+- 大的查询可能触发多个 API 请求（分页），每个都会计入限流
+
+更多详细信息请查看：[API 限流功能文档](docs/RATE_LIMITING.md)
+
+### Google 搜索引擎配置步骤：
 
 1. **获取 API 密钥**：
    - 访问 [Google Cloud Console](https://console.cloud.google.com/)

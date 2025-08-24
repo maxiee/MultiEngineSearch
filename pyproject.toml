@@ -2,22 +2,21 @@
 name = "multienginesearch"
 version = "0.1.0"
 description = "Multi-Engine Search - 多引擎搜索工具"
-authors = [
-    {name = "Maxiee",email = "maxieewong@gmail.com"}
-]
+authors = [{ name = "Maxiee", email = "maxieewong@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "typer[all] (>=0.16.0,<0.17.0)",
     "duckduckgo-search>=6.0.0",
-    "requests>=2.31.0"
+    "requests>=2.31.0",
+    "pytz>=2023.3",
 ]
 
 [project.scripts]
 mes = "multienginesearch.cli:main"
 
 [tool.poetry]
-packages = [{include = "multienginesearch", from = "src"}]
+packages = [{ include = "multienginesearch", from = "src" }]
 
 
 [tool.poetry.group.dev.dependencies]

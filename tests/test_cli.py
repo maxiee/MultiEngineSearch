@@ -6,7 +6,10 @@ import pytest
 from typer.testing import CliRunner
 from unittest.mock import patch, MagicMock
 from multienginesearch.cli import app
-from multienginesearch.engines import SearchResult  # 导入 SearchResult
+from multienginesearch.engines import (
+    SearchResult,
+    SearchResponse,
+)  # 导入 SearchResult 和 SearchResponse
 
 runner = CliRunner()
 
@@ -33,7 +36,7 @@ def test_search_command(mock_create_engine):
     # 配置模拟引擎和搜索方法
     mock_engine = MagicMock()
     mock_engine.name = "duckduckgo"
-    mock_engine.search.return_value = [
+    search_results = [
         SearchResult(
             title="Test Title 1",
             url="http://example.com/1",
@@ -47,6 +50,7 @@ def test_search_command(mock_create_engine):
             engine="duckduckgo",
         ),
     ]
+    mock_engine.search.return_value = SearchResponse(search_results)
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(app, ["search", "test query"])
@@ -64,7 +68,7 @@ def test_search_with_verbose(mock_create_engine):
     # 配置模拟引擎和搜索方法
     mock_engine = MagicMock()
     mock_engine.name = "duckduckgo"
-    mock_engine.search.return_value = [
+    search_results = [
         SearchResult(
             title="Verbose Test",
             url="http://example.com/verbose",
@@ -72,6 +76,7 @@ def test_search_with_verbose(mock_create_engine):
             engine="duckduckgo",
         )
     ]
+    mock_engine.search.return_value = SearchResponse(search_results)
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(app, ["search", "test query", "--verbose"])
@@ -90,7 +95,7 @@ def test_search_with_options():
             "search",
             "test query",
             "--engine",
-            "google",
+            "bing",  # 使用不支持的引擎Bing而不Google
             "--limit",
             "5",
             "--output",
@@ -98,9 +103,9 @@ def test_search_with_options():
             "--verbose",
         ],
     )
-    # Google 引擎不支持，应该返回错误
+    # Bing 引擎不支持，应该返回错误
     assert result.exit_code == 1
-    assert "不支持的搜索引擎: google" in result.stdout
+    assert "不支持的搜索引擎: bing" in result.stdout
 
 
 @patch("multienginesearch.cli.SearchEngineFactory.create_engine")
@@ -109,7 +114,7 @@ def test_search_with_duckduckgo(mock_create_engine):
     # 配置模拟引擎和搜索方法
     mock_engine = MagicMock()
     mock_engine.name = "duckduckgo"
-    mock_engine.search.return_value = [
+    search_results = [
         SearchResult(
             title="Python Test",
             url="http://python.org",
@@ -129,6 +134,7 @@ def test_search_with_duckduckgo(mock_create_engine):
             engine="duckduckgo",
         ),
     ]
+    mock_engine.search.return_value = SearchResponse(search_results)
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(
@@ -169,7 +175,7 @@ def test_search_with_time_filter(mock_create_engine):
     # 配置模拟引擎和搜索方法
     mock_engine = MagicMock()
     mock_engine.name = "duckduckgo"
-    mock_engine.search.return_value = [
+    search_results = [
         SearchResult(
             title="Recent News",
             url="http://example.com/news_day",
@@ -177,6 +183,7 @@ def test_search_with_time_filter(mock_create_engine):
             engine="duckduckgo",
         )
     ]
+    mock_engine.search.return_value = SearchResponse(search_results)
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(
@@ -205,10 +212,10 @@ def test_search_with_time_filter(mock_create_engine):
 @patch("multienginesearch.cli.SearchEngineFactory.create_engine")
 def test_search_no_results(mock_create_engine):
     """测试搜索没有结果的情况"""
-    # 配置模拟引擎和搜索方法，返回空列表
+    # 配置模拟引擎和搜索方法，返回空响应
     mock_engine = MagicMock()
     mock_engine.name = "duckduckgo"
-    mock_engine.search.return_value = []
+    mock_engine.search.return_value = SearchResponse([])
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(app, ["search", "a query that yields no results"])
@@ -238,7 +245,7 @@ def test_search_output_json(mock_create_engine):
             engine="duckduckgo",
         ),
     ]
-    mock_engine.search.return_value = mock_search_results
+    mock_engine.search.return_value = SearchResponse(mock_search_results)
     mock_create_engine.return_value = mock_engine
 
     result = runner.invoke(app, ["search", "json output test", "--output", "json"])
@@ -248,10 +255,13 @@ def test_search_output_json(mock_create_engine):
 
     try:
         output_data = json.loads(result.stdout)
-        assert isinstance(output_data, list)
-        assert len(output_data) == 2
-        assert output_data[0]["title"] == "JSON Test 1"
-        assert output_data[1]["url"] == "http://example.com/json2"
+        assert isinstance(output_data, dict)
+        assert "results" in output_data
+        assert "count" in output_data
+        assert output_data["count"] == 2
+        assert len(output_data["results"]) == 2
+        assert output_data["results"][0]["title"] == "JSON Test 1"
+        assert output_data["results"][1]["url"] == "http://example.com/json2"
     except json.JSONDecodeError:
         pytest.fail("Output is not valid JSON")
     mock_engine.search.assert_called_once_with("json output test", 10, time_filter=None)
